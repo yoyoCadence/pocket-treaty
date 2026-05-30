@@ -8,6 +8,7 @@ Lightweight task board. See AGENTS.md §8 for lifecycle rules.
 
 - [ ] Phase 6: UI 精修 — Dashboard cards, empty states, icons, toast feedback
 - [ ] Phase 10: PWA manifest + GitHub Pages base path + deploy workflow
+- [ ] 新增功能時補充對應測試（規則：純邏輯必測，UI component 暫緩）
 
 ---
 
@@ -117,3 +118,19 @@ Lightweight task board. See AGENTS.md §8 for lifecycle rules.
 - [x] RecordsPage: trash icon → bottom-sheet confirmation (mobile-friendly)
 - [x] RecordsPage: delete cascades to expense_shares in store
 - [x] npm run build ✓ (TypeScript clean, 236KB JS bundle)
+
+### Tests: settlement.ts + autofill.ts ✅
+- [x] Install Vitest + @vitest/coverage-v8
+- [x] Configure vite.config.ts (test environment, coverage include/exclude)
+- [x] Add npm scripts: test / test:run / test:coverage
+- [x] settlement.test.ts — 39 tests covering:
+  - calculateExpenseDebts (5 cases: equal, payer exclusion, single_person, none, zero share)
+  - calculateNetBalances (7 cases: A/B/C/D scenarios, mock data 170, settled, overpaid)
+  - getBalanceBetween symmetry
+  - getSettlementDetails (3 cases: breakdown count, third-party exclusion, 3-person group)
+  - formatBalanceSummary (6 cases: I owe, other owes, settled, large amount, third party, unknown id fallback)
+  - formatCurrency (4 cases: normal, thousands, negative, zero)
+  - sumExpensesInRange (6 cases: range, start boundary, end boundary, outside, empty, all)
+- [x] autofill.test.ts — 14 tests covering all time slots + boundaries + valid categoryId check
+- [x] 53 tests, all passing
+- [x] settlement.ts coverage: 100% Stmts / 100% Branch / 100% Funcs / 100% Lines
