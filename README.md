@@ -1,4 +1,8 @@
-# Pocket Treaty（口袋條約）
+[English](README.md) | [繁體中文](README.zh-TW.md) | [日本語](README.ja.md)
+
+---
+
+# Pocket Treaty
 
 A mobile-first PWA for expense tracking and split settlement — built for couples and families who take turns paying shared expenses.
 
@@ -37,7 +41,7 @@ Pocket Treaty solves a real daily problem: when you and your partner (or family)
 | Build | Vite |
 | UI | React + TypeScript |
 | Styling | Tailwind CSS |
-| State | Zustand (if needed) |
+| State | Zustand |
 | Backend | Supabase (Phase 7+) |
 | Charts | Recharts |
 | Dates | date-fns |
@@ -50,12 +54,11 @@ Pocket Treaty solves a real daily problem: when you and your partner (or family)
 
 | Phase | Goal | Status |
 |---|---|---|
-| 0 | Documentation init | Done |
-| 1 | First runnable mock version | In Progress |
-| 2 | Settlement logic MVP | Backlog |
+| 0 | Documentation init | ✅ Done |
+| 1 | First runnable mock version | ✅ Done |
+| 2 | Settlement logic & repayment UI | ✅ Done |
 | 3 | Add Expense flow | Backlog |
 | 4 | Records and editing | Backlog |
-| 5 | Settlement page | Backlog |
 | 6 | UI polish | Backlog |
 | 7 | Supabase integration | Backlog |
 | 8 | CSV export | Backlog |
