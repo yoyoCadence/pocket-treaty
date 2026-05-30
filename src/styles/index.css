@@ -15,7 +15,6 @@
     overscroll-behavior: none;
   }
 
-  /* Safe area padding for notch / home indicator */
   #root {
     min-height: 100dvh;
     display: flex;
@@ -49,4 +48,19 @@
   .label-sm {
     @apply text-xs font-medium text-gray-400 uppercase tracking-wide;
   }
+}
+
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.animate-toast-in {
+  animation: toast-in 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }

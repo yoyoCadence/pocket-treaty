@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useAppStore } from '../stores/useAppStore'
+import { toast } from '../stores/useToastStore'
 import { todayStr, nowTimeStr } from '../lib/date'
 import { suggestCategoryByTime } from '../lib/autofill'
 import { formatCurrency } from '../lib/settlement'
@@ -121,9 +122,11 @@ export default function AddExpensePage() {
 
     if (isEditing) {
       updateExpense(expense, shares)
+      toast.success('支出已更新')
       navigate('/records')
     } else {
       addExpense(expense, shares)
+      toast.success('支出已記錄')
       navigate('/')
     }
   }

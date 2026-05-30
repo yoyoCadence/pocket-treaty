@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAppStore } from '../stores/useAppStore'
+import { toast } from '../stores/useToastStore'
 import { formatDisplayDateTime } from '../lib/date'
 import { clsx } from 'clsx'
 import { Pencil, Trash2, ChevronDown, X } from 'lucide-react'
@@ -42,8 +43,10 @@ export default function RecordsPage() {
   // ── Delete ────────────────────────────────────────────────────────────
   function confirmDelete() {
     if (deleteTarget) {
+      const title = expenses.find(e => e.id === deleteTarget)?.title ?? '支出'
       deleteExpense(deleteTarget)
       setDeleteTarget(null)
+      toast.success(`「${title}」已刪除`)
     }
   }
 

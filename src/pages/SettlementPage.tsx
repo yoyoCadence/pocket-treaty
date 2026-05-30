@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useAppStore } from '../stores/useAppStore'
+import { toast } from '../stores/useToastStore'
 import { getSettlementDetails, formatCurrency, formatBalanceSummary } from '../lib/settlement'
 import { formatDisplayDate, todayStr } from '../lib/date'
 import { clsx } from 'clsx'
@@ -64,6 +65,7 @@ export default function SettlementPage() {
       createdAt: new Date().toISOString(),
     }
     addSettlement(settlement)
+    toast.success(`已記錄還款 ${formatCurrency(amount)}`)
     setRepayAmount('')
     setRepayNote('')
     setShowRepayForm(false)

@@ -1,7 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import {
   calculateExpenseDebts,
-  calculateNetBalances,
   getBalanceBetween,
   getSettlementDetails,
   formatBalanceSummary,
