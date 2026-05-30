@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import { useAppStore } from '../stores/useAppStore'
 import { todayStr, nowTimeStr } from '../lib/date'
 import { suggestCategoryByTime } from '../lib/autofill'
@@ -15,76 +15,93 @@ function generateId() {
   return `exp_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`
 }
 
+function buildShares(
+  expenseId: string,
+  payerId: string,
+  splitType: SplitType,
+  participants: string[],
+  amount: number
+): ExpenseShare[] {
+  if (splitType === 'equal') {
+    const each = Math.round((amount / participants.length) * 100) / 100
+    return participants.map((pId, i) => ({
+      id: `${expenseId}_s${i}`,
+      expenseId,
+      personId: pId,
+      shareAmount: each,
+      shareRatio: 1 / participants.length,
+    }))
+  }
+  if (splitType === 'single_person') {
+    const debtor = participants.find(p => p !== payerId) ?? SELF_ID
+    return [{
+      id: `${expenseId}_s0`,
+      expenseId,
+      personId: debtor,
+      shareAmount: amount,
+      shareRatio: 1,
+    }]
+  }
+  return []
+}
+
 export default function AddExpensePage() {
   const navigate = useNavigate()
-  const { categories, people, addExpense } = useAppStore()
+  const { id: editId } = useParams<{ id?: string }>()
+  const { categories, people, expenses, expenseShares, addExpense, updateExpense } = useAppStore()
+
+  const isEditing = !!editId
+  const existing  = isEditing ? expenses.find(e => e.id === editId) : undefined
 
   const nowTime = nowTimeStr()
-  const [amount, setAmount]       = useState('')
-  const [title, setTitle]         = useState('')
-  const [date, setDate]           = useState(todayStr())
-  const [time, setTime]           = useState(nowTime)
-  const [categoryId, setCategoryId] = useState(suggestCategoryByTime(nowTime))
-  const [payerId, setPayerId]     = useState(PARTNER_ID)
-  const [splitType, setSplitType] = useState<SplitType>('equal')
-  const [participants]            = useState<string[]>([SELF_ID, PARTNER_ID])
-  const [note, setNote]           = useState('')
+  const [amount,     setAmount]     = useState(existing ? String(existing.amount) : '')
+  const [title,      setTitle]      = useState(existing?.title ?? '')
+  const [date,       setDate]       = useState(existing?.date ?? todayStr())
+  const [time,       setTime]       = useState(existing?.time ?? nowTime)
+  const [categoryId, setCategoryId] = useState(
+    existing?.categoryId ?? suggestCategoryByTime(nowTime)
+  )
+  const [payerId,    setPayerId]    = useState(existing?.payerPersonId ?? PARTNER_ID)
+  const [splitType,  setSplitType]  = useState<SplitType>(existing?.splitType ?? 'equal')
+  const [note,       setNote]       = useState(existing?.note ?? '')
 
-  const numAmount = parseFloat(amount) || 0
+  const participants = [SELF_ID, PARTNER_ID]
+  const numAmount    = parseFloat(amount) || 0
 
-  // Preview calculation
+  // ── Preview ──────────────────────────────────────────────────────────────
   function getPreview(): string {
     if (numAmount <= 0) return ''
-    if (splitType === 'none') return `${people.find(p => p.id === payerId)?.name}全額負擔，不分帳`
+    if (splitType === 'none') {
+      return `${people.find(p => p.id === payerId)?.name}全額負擔，不分帳`
+    }
     if (splitType === 'equal') {
-      const each = numAmount / participants.length
-      const debtor = participants.find(p => p !== payerId)
+      const each    = numAmount / participants.length
+      const debtor  = participants.find(p => p !== payerId)
       if (!debtor) return '全由付款者負擔'
-      const debtorName = people.find(p => p.id === debtor)?.name ?? debtor
-      const creditorName = people.find(p => p.id === payerId)?.name ?? payerId
-      if (debtor === SELF_ID) {
-        return `你欠${creditorName} ${formatCurrency(each)}`
-      }
-      return `${debtorName}欠你 ${formatCurrency(each)}`
+      const dName = people.find(p => p.id === debtor)?.name ?? debtor
+      const cName = people.find(p => p.id === payerId)?.name ?? payerId
+      return debtor === SELF_ID
+        ? `你欠${cName} ${formatCurrency(each)}`
+        : `${dName}欠你 ${formatCurrency(each)}`
     }
     if (splitType === 'single_person') {
       const debtor = participants.find(p => p !== payerId) ?? SELF_ID
-      const debtorName = people.find(p => p.id === debtor)?.name ?? debtor
-      const creditorName = people.find(p => p.id === payerId)?.name ?? payerId
-      if (debtor === SELF_ID) return `你欠${creditorName} ${formatCurrency(numAmount)}`
-      return `${debtorName}欠你 ${formatCurrency(numAmount)}`
+      const dName  = people.find(p => p.id === debtor)?.name ?? debtor
+      const cName  = people.find(p => p.id === payerId)?.name ?? payerId
+      return debtor === SELF_ID
+        ? `你欠${cName} ${formatCurrency(numAmount)}`
+        : `${dName}欠你 ${formatCurrency(numAmount)}`
     }
     return ''
   }
 
+  // ── Save ─────────────────────────────────────────────────────────────────
   function handleSave() {
     if (!title.trim() || numAmount <= 0) return
 
-    const id = generateId()
-    const now = new Date().toISOString()
-
-    const shares: ExpenseShare[] = []
-    if (splitType === 'equal') {
-      const each = Math.round((numAmount / participants.length) * 100) / 100
-      participants.forEach((pId, i) => {
-        shares.push({
-          id: `${id}_s${i}`,
-          expenseId: id,
-          personId: pId,
-          shareAmount: each,
-          shareRatio: 1 / participants.length,
-        })
-      })
-    } else if (splitType === 'single_person') {
-      const debtor = participants.find(p => p !== payerId) ?? SELF_ID
-      shares.push({
-        id: `${id}_s0`,
-        expenseId: id,
-        personId: debtor,
-        shareAmount: numAmount,
-        shareRatio: 1,
-      })
-    }
+    const id   = isEditing ? editId! : generateId()
+    const now  = new Date().toISOString()
+    const shares = buildShares(id, payerId, splitType, participants, numAmount)
 
     const expense: Expense = {
       id,
@@ -98,13 +115,23 @@ export default function AddExpensePage() {
       payerPersonId: payerId,
       splitType,
       isSettled: false,
-      createdAt: now,
+      createdAt: isEditing ? (existing?.createdAt ?? now) : now,
       updatedAt: now,
     }
 
-    addExpense(expense, shares)
-    navigate('/')
+    if (isEditing) {
+      updateExpense(expense, shares)
+      navigate('/records')
+    } else {
+      addExpense(expense, shares)
+      navigate('/')
+    }
   }
+
+  // Warn if editing an expense that has a settlement referencing it
+  const hasSettlementRisk = isEditing && expenseShares
+    .filter(s => s.expenseId === editId)
+    .length > 0
 
   const preview = getPreview()
 
@@ -112,10 +139,15 @@ export default function AddExpensePage() {
     <div className="px-4 pt-4 pb-6 space-y-4">
       {/* Header */}
       <div className="flex items-center gap-3">
-        <button onClick={() => navigate(-1)} className="p-2 -ml-2 rounded-xl text-gray-500 active:bg-gray-100">
+        <button
+          onClick={() => navigate(-1)}
+          className="p-2 -ml-2 rounded-xl text-gray-500 active:bg-gray-100"
+        >
           <ChevronLeft size={22} />
         </button>
-        <h1 className="text-xl font-bold text-brand-primary flex-1">新增支出</h1>
+        <h1 className="text-xl font-bold text-brand-primary flex-1">
+          {isEditing ? '編輯支出' : '新增支出'}
+        </h1>
         <button
           onClick={handleSave}
           disabled={!title.trim() || numAmount <= 0}
@@ -126,9 +158,18 @@ export default function AddExpensePage() {
               : 'bg-gray-100 text-gray-400'
           )}
         >
-          <Check size={16} /> 儲存
+          <Check size={16} /> {isEditing ? '更新' : '儲存'}
         </button>
       </div>
+
+      {/* Edit warning */}
+      {hasSettlementRisk && (
+        <div className="rounded-2xl bg-amber-50 border border-amber-200 px-4 py-2.5">
+          <p className="text-xs text-amber-700 font-medium">
+            ⚠️ 修改此支出會重新計算分帳結果，請確認後儲存。
+          </p>
+        </div>
+      )}
 
       {/* Amount */}
       <div className="card">
@@ -162,13 +203,24 @@ export default function AddExpensePage() {
       <div className="grid grid-cols-2 gap-3">
         <div className="card">
           <label className="label-sm mb-2 block">日期</label>
-          <input type="date" value={date} onChange={e => setDate(e.target.value)}
-            className="text-sm font-medium text-gray-800 bg-transparent outline-none w-full" />
+          <input
+            type="date"
+            value={date}
+            onChange={e => setDate(e.target.value)}
+            className="text-sm font-medium text-gray-800 bg-transparent outline-none w-full"
+          />
         </div>
         <div className="card">
           <label className="label-sm mb-2 block">時間</label>
-          <input type="time" value={time} onChange={e => { setTime(e.target.value); setCategoryId(suggestCategoryByTime(e.target.value)) }}
-            className="text-sm font-medium text-gray-800 bg-transparent outline-none w-full" />
+          <input
+            type="time"
+            value={time}
+            onChange={e => {
+              setTime(e.target.value)
+              if (!isEditing) setCategoryId(suggestCategoryByTime(e.target.value))
+            }}
+            className="text-sm font-medium text-gray-800 bg-transparent outline-none w-full"
+          />
         </div>
       </div>
 
@@ -177,7 +229,8 @@ export default function AddExpensePage() {
         <label className="label-sm mb-3 block">類別</label>
         <div className="flex flex-wrap gap-2">
           {categories.map(cat => (
-            <button key={cat.id}
+            <button
+              key={cat.id}
               onClick={() => setCategoryId(cat.id)}
               className={clsx(
                 'flex items-center gap-1 px-3 py-1.5 rounded-xl text-sm font-medium transition-all',
@@ -196,19 +249,22 @@ export default function AddExpensePage() {
       <div className="card">
         <label className="label-sm mb-3 block">付款者</label>
         <div className="flex gap-2">
-          {people.filter(p => [SELF_ID, PARTNER_ID].includes(p.id)).map(person => (
-            <button key={person.id}
-              onClick={() => setPayerId(person.id)}
-              className={clsx(
-                'flex-1 py-2.5 rounded-xl text-sm font-semibold transition-all',
-                payerId === person.id
-                  ? 'bg-brand-primary text-white'
-                  : 'bg-brand-bg text-gray-600'
-              )}
-            >
-              {person.name}
-            </button>
-          ))}
+          {people
+            .filter(p => [SELF_ID, PARTNER_ID].includes(p.id))
+            .map(person => (
+              <button
+                key={person.id}
+                onClick={() => setPayerId(person.id)}
+                className={clsx(
+                  'flex-1 py-2.5 rounded-xl text-sm font-semibold transition-all',
+                  payerId === person.id
+                    ? 'bg-brand-primary text-white'
+                    : 'bg-brand-bg text-gray-600'
+                )}
+              >
+                {person.name}
+              </button>
+            ))}
         </div>
       </div>
 
@@ -221,7 +277,8 @@ export default function AddExpensePage() {
             { value: 'single_person', label: '單人全擔' },
             { value: 'none',          label: '不分帳' },
           ] as const).map(opt => (
-            <button key={opt.value}
+            <button
+              key={opt.value}
               onClick={() => setSplitType(opt.value)}
               className={clsx(
                 'flex-1 py-2.5 rounded-xl text-sm font-semibold transition-all',

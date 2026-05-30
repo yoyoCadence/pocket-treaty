@@ -18,6 +18,7 @@ interface AppStore {
   settlements: Settlement[]
 
   addExpense: (expense: Expense, shares: ExpenseShare[]) => void
+  updateExpense: (expense: Expense, shares: ExpenseShare[]) => void
   deleteExpense: (expenseId: string) => void
   addSettlement: (settlement: Settlement) => void
 }
@@ -34,6 +35,15 @@ export const useAppStore = create<AppStore>((set) => ({
     set(state => ({
       expenses: [expense, ...state.expenses],
       expenseShares: [...state.expenseShares, ...shares],
+    })),
+
+  updateExpense: (expense, shares) =>
+    set(state => ({
+      expenses: state.expenses.map(e => e.id === expense.id ? expense : e),
+      expenseShares: [
+        ...state.expenseShares.filter(s => s.expenseId !== expense.id),
+        ...shares,
+      ],
     })),
 
   deleteExpense: (expenseId) =>
