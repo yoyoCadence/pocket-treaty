@@ -1,6 +1,11 @@
 import { format, startOfWeek, startOfMonth, endOfMonth, endOfWeek } from 'date-fns'
 import { zhTW } from 'date-fns/locale'
 
+function parseLocalDate(dateStr: string): Date {
+  const [year, month, day] = dateStr.split('-').map(Number)
+  return new Date(year, month - 1, day)
+}
+
 export function todayStr(): string {
   return format(new Date(), 'yyyy-MM-dd')
 }
@@ -26,9 +31,9 @@ export function nowTimeStr(): string {
 }
 
 export function formatDisplayDate(dateStr: string): string {
-  return format(new Date(dateStr), 'M/d (EEE)', { locale: zhTW })
+  return format(parseLocalDate(dateStr), 'M/d (EEE)', { locale: zhTW })
 }
 
 export function formatDisplayDateTime(dateStr: string, timeStr: string): string {
-  return `${format(new Date(dateStr), 'M/d')} ${timeStr}`
+  return `${format(parseLocalDate(dateStr), 'M/d')} ${timeStr}`
 }

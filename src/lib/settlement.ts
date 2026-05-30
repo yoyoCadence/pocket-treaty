@@ -18,6 +18,7 @@ export function calculateExpenseDebts(
 ): DebtEntry[] {
   const result: DebtEntry[] = []
   for (const share of shares) {
+    if (share.expenseId !== expense.id) continue
     if (share.personId === expense.payerPersonId) continue
     if (share.shareAmount <= 0) continue
     result.push({
