@@ -108,6 +108,17 @@ describe('calculateExpenseDebts', () => {
     ]
     expect(calculateExpenseDebts(exp, shares)).toHaveLength(0)
   })
+
+  it('忽略不屬於該 expense 的 shares', () => {
+    const exp = expense({ id: 'e1', payerPersonId: ME, amount: 200 })
+    const shares = [
+      share({ id: 's1', expenseId: 'e1', personId: GF, shareAmount: 100 }),
+      share({ id: 's2', expenseId: 'other-expense', personId: GF, shareAmount: 999 }),
+    ]
+    const debts = calculateExpenseDebts(exp, shares)
+    expect(debts).toHaveLength(1)
+    expect(debts[0].amount).toBe(100)
+  })
 })
 
 // ─── calculateNetBalances ──────────────────────────────────────────────────

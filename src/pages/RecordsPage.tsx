@@ -218,11 +218,11 @@ export default function RecordsPage() {
         <>
           {/* Backdrop */}
           <div
-            className="fixed inset-0 bg-black/40 z-40"
+            className="fixed inset-0 bg-black/40 z-[60]"
             onClick={() => setDeleteTarget(null)}
           />
           {/* Sheet */}
-          <div className="fixed bottom-0 left-0 right-0 z-50 bg-white rounded-t-3xl p-6 space-y-4 max-w-lg mx-auto"
+          <div className="fixed bottom-0 left-0 right-0 z-[70] bg-white rounded-t-3xl p-6 space-y-4 max-w-lg mx-auto"
                style={{ paddingBottom: 'calc(1.5rem + env(safe-area-inset-bottom))' }}>
             <div className="w-10 h-1 rounded-full bg-gray-200 mx-auto mb-2" />
             <div>

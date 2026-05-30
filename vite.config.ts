@@ -12,8 +12,8 @@ export default defineConfig({
     coverage: {
       provider: 'v8',
       reporter: ['text', 'html'],
-      include: ['src/lib/**/*.ts'],
-      exclude: ['src/lib/supabase.ts'],
+      include: ['src/lib/**/*.ts', 'src/stores/**/*.ts', 'src/data/**/*.ts'],
+      exclude: ['src/lib/supabase.ts', 'src/lib/csv.ts', 'src/**/*.test.ts'],
     },
   },
 })

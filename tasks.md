@@ -133,3 +133,14 @@ Lightweight task board. See AGENTS.md §8 for lifecycle rules.
 - [x] autofill.test.ts — 14 tests covering all time slots + boundaries + valid categoryId check
 - [x] 53 tests, all passing
 - [x] settlement.ts coverage: 100% Stmts / 100% Branch / 100% Funcs / 100% Lines
+
+### App Health Check + Store Regression Tests ✅
+- [x] Add mock data integrity tests (unique ids, valid references, share totals, documented net NT$170)
+- [x] Add Zustand store regression tests (add/update/delete expense, cascade shares, add settlement)
+- [x] Add toast store regression tests (helper types, max visible toasts, manual/auto dismiss)
+- [x] Add date utility tests for clock-derived date ranges and local date formatting
+- [x] Harden settlement debt derivation against unrelated shares
+- [x] Fix date display parsing to avoid UTC date shifts for YYYY-MM-DD strings
+- [x] Fix mobile delete confirmation sheet z-index so bottom nav no longer intercepts confirm clicks
+- [x] Enable React Router v7 future flags to keep dev console warning-free
+- [x] Verify: npm run test -- --run ✓, npm run test:coverage ✓ (100%), npm run lint ✓, npm run build ✓

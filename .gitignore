@@ -40,6 +40,7 @@ test-results/
 playwright-report/
 blob-report/
 .playwright/
+.playwright-cli/
 
 # ── 編輯器設定 ────────────────────────────
 .vscode/*
