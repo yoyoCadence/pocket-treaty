@@ -6,10 +6,8 @@ Lightweight task board. See AGENTS.md §8 for lifecycle rules.
 
 ## Next
 
-- [ ] Phase 3: Confirm AddExpensePage saves correctly and Dashboard/SettlementPage update reactively
-- [ ] Phase 4: RecordsPage — filter by category / payer / date range
-- [ ] Phase 4: Delete expense (cascade remove shares)
-- [ ] Phase 4: Edit expense (sync shares on update)
+- [ ] Phase 6: UI 精修 — Dashboard cards, empty states, icons, toast feedback
+- [ ] Phase 10: PWA manifest + GitHub Pages base path + deploy workflow
 
 ---
 
@@ -107,3 +105,15 @@ Lightweight task board. See AGENTS.md §8 for lifecycle rules.
 - [x] Settlement history list (collapsible after 3 items)
 - [x] Balance card and breakdown update immediately after adding repayment
 - [x] npm run build ✓ (TypeScript clean, 230KB JS bundle)
+
+### Phase 3 + Phase 4: Edit / Filter / Delete ✅
+- [x] AddExpensePage: edit mode via /edit/:id — pre-fills all fields, calls updateExpense
+- [x] AddExpensePage: shows warning banner if editing expense that already has shares
+- [x] Store: updateExpense action atomically replaces expense + shares
+- [x] RecordsPage: category filter chips (全部 + 10 categories)
+- [x] RecordsPage: payer filter chips (全部 / 我 / 女友)
+- [x] RecordsPage: collapsible filter panel, active count badge
+- [x] RecordsPage: pencil icon → /edit/:id navigation
+- [x] RecordsPage: trash icon → bottom-sheet confirmation (mobile-friendly)
+- [x] RecordsPage: delete cascades to expense_shares in store
+- [x] npm run build ✓ (TypeScript clean, 236KB JS bundle)
