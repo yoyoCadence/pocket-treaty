@@ -6,7 +6,6 @@ Lightweight task board. See AGENTS.md §8 for lifecycle rules.
 
 ## Next
 
-- [ ] Phase 6: UI 精修 — Dashboard cards, empty states, icons, toast feedback
 - [ ] Phase 10: PWA manifest + GitHub Pages base path + deploy workflow
 - [ ] 新增功能時補充對應測試（規則：純邏輯必測，UI component 暫緩）
 
