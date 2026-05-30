@@ -1,0 +1,52 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Noto Sans TC', sans-serif;
+    -webkit-tap-highlight-color: transparent;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  body {
+    background-color: #F7F4EF;
+    min-height: 100dvh;
+    overscroll-behavior: none;
+  }
+
+  /* Safe area padding for notch / home indicator */
+  #root {
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+  }
+}
+
+@layer components {
+  .card {
+    @apply bg-white rounded-2xl shadow-card p-4;
+  }
+
+  .btn-primary {
+    @apply bg-brand-primary text-white rounded-xl px-4 py-3 font-semibold
+           active:scale-95 transition-transform;
+  }
+
+  .btn-ghost {
+    @apply text-brand-primary rounded-xl px-4 py-3 font-medium
+           active:scale-95 transition-transform;
+  }
+
+  .amount-large {
+    @apply text-4xl font-bold tracking-tight text-brand-primary;
+  }
+
+  .amount-medium {
+    @apply text-2xl font-bold text-brand-primary;
+  }
+
+  .label-sm {
+    @apply text-xs font-medium text-gray-400 uppercase tracking-wide;
+  }
+}
